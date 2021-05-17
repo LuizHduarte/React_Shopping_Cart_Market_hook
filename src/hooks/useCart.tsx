@@ -1,7 +1,7 @@
 import { createContext, ReactNode, useContext, useState } from 'react';
 import { toast } from 'react-toastify'
 import { api } from '../services/api';
-import { Product, Stock } from '../types';
+import { Product } from '../types';
 
 interface CartProviderProps {
   children: ReactNode;
@@ -34,7 +34,7 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
 
   const addProduct = async (productId: number) => {
     try {
-      const updatedCart = cart.map(product => ({...product}))
+      const updatedCart = cart.map(product => ({ ...product }))
       const productExists = updatedCart.find(product => product.id === productId)
 
       const stock = await api.get(`/stock/${productId}`)
@@ -43,26 +43,26 @@ export function CartProvider({ children }: CartProviderProps): JSX.Element {
       const current = productExists ? productExists.amount : 0;
       const amount = current + 1
 
-      if(amount > stockAmount) {
+      if (amount > stockAmount) {
         toast.error('Quantidade solicitada fora de estoque')
         return
       }
 
-      if(productExists){
+      if (productExists) {
         productExists.amount = amount
-      } else{
+      } else {
         const product = await api.get(`/products/${productId}`)
 
         const newProduct = {
           ...product.data,
-          amount:1
+          amount: 1
         }
         updatedCart.push(newProduct)
       }
 
       setCart(updatedCart)
       const stringCart = JSON.stringify(updatedCart)
-      localStorage.setItem('@RocketShoes:cart',stringCart)
+      localStorage.setItem('@RocketShoes:cart', stringCart)
 
     } catch {
       toast.error('Erro na adição do produto')
